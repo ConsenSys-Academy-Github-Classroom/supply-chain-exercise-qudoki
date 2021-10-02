@@ -22,7 +22,7 @@ contract SupplyChain {
     uint sku;
     uint price;
     uint state; //Tests up to here passing
-    address seller;
+    address owner;
     address buyer;
   }
   /* 
@@ -30,20 +30,45 @@ contract SupplyChain {
    */
 
   // <LogForSale event: sku arg>
-
+  event LogForSale (
+    address owner,
+    uint sku,
+    uint price,
+    uint state
+  );
   // <LogSold event: sku arg>
-
+  event LogSold (
+    address owner,
+    address buyer,
+    uint sku,
+    uint price,
+    uint state
+  );
   // <LogShipped event: sku arg>
-
+  event LogShipped (
+    address owner,
+    address buyer,
+    uint sku,
+    uint price,
+    uint state
+  );
   // <LogReceived event: sku arg>
-
+  event LogReceived (
+    address buyer,
+    uint sku,
+    uint price,
+    uint state
+  );
 
   /* 
    * Modifiers
    */
 
   // Create a modifer, `isOwner` that checks if the msg.sender is the owner of the contract
-
+  modifier isOwner (address _address) {
+    require (msg.sender == owner);
+    _;
+  }
   // <modifier: isOwner
 
   modifier verifyCaller (address _address) { 
