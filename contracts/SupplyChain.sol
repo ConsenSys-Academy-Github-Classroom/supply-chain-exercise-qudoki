@@ -8,7 +8,7 @@ contract SupplyChain {
   // <skuCount>
   uint public skuCount;
   // <items mapping>
-  mapping(address => uint) public items;
+  mapping(uint => Item) public items;
   // <enum State: ForSale, Sold, Shipped, Received>
   enum State {
     ForSale,
@@ -21,52 +21,30 @@ contract SupplyChain {
     string name;
     uint sku;
     uint price;
-    uint state; //Tests up to here passing
-    address owner;
-    address buyer;
+    State state;
+    address payable seller;
+    address payable buyer;
   }
   /* 
    * Events
    */
 
   // <LogForSale event: sku arg>
-  event LogForSale (
-    address owner,
-    uint sku,
-    uint price,
-    uint state
-  );
+  event LogForSale (uint sku);
   // <LogSold event: sku arg>
-  event LogSold (
-    address owner,
-    address buyer,
-    uint sku,
-    uint price,
-    uint state
-  );
+  event LogSold (uint sku);
   // <LogShipped event: sku arg>
-  event LogShipped (
-    address owner,
-    address buyer,
-    uint sku,
-    uint price,
-    uint state
-  );
+  event LogShipped (uint sku);
   // <LogReceived event: sku arg>
-  event LogReceived (
-    address buyer,
-    uint sku,
-    uint price,
-    uint state
-  );
+  event LogReceived (uint sku);
 
   /* 
    * Modifiers
    */
 
   // Create a modifer, `isOwner` that checks if the msg.sender is the owner of the contract
-  modifier isOwner (address _address) {
-    require (msg.sender == owner);
+  modifier isOwner () {
+    require (msg.sender == owner, "Not the owner!");
     _;
   }
   // <modifier: isOwner
@@ -83,10 +61,10 @@ contract SupplyChain {
 
   modifier checkValue(uint _sku) {
     //refund them after pay for item (why it is before, _ checks for logic before func)
-    _;
     // uint _price = items[_sku].price;
     // uint amountToRefund = msg.value - _price;
     // items[_sku].buyer.transfer(amountToRefund);
+    _;
   }
 
   // For each of the following modifiers, use what you learned about modifiers
