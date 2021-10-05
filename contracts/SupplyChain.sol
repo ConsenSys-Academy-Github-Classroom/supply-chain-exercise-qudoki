@@ -5,9 +5,9 @@ contract SupplyChain {
     // <owner>
     address public owner = msg.sender;
     // <skuCount>
-    uint256 public skuCount;
+    uint public skuCount;
     // <items mapping>
-    mapping(uint256 => Item) public items;
+    mapping(uint => Item) public items;
     // <enum State: ForSale, Sold, Shipped, Received>
     enum State {
         ForSale,
@@ -29,13 +29,13 @@ contract SupplyChain {
      */
 
     // <LogForSale event: sku arg>
-    event LogForSale(uint256 sku);
+    event LogForSale(uint sku);
     // <LogSold event: sku arg>
-    event LogSold(uint256 sku);
+    event LogSold(uint sku);
     // <LogShipped event: sku arg>
-    event LogShipped(uint256 sku);
+    event LogShipped(uint sku);
     // <LogReceived event: sku arg>
-    event LogReceived(uint256 sku);
+    event LogReceived(uint sku);
 
     /*
      * Modifiers
@@ -53,16 +53,16 @@ contract SupplyChain {
         _;
     }
 
-    modifier paidEnough(uint256 _price) {
+    modifier paidEnough(uint _price) {
         require(msg.value >= _price);
         _;
     }
 
-    modifier checkValue(uint256 _sku) {
+    modifier checkValue(uint _sku) {
         //refund them after pay for item (why it is before, _ checks for logic before func)
         _; //first, they're going to pay
-        uint256 _price = items[_sku].price;
-        uint256 amountToRefund = msg.value - _price;
+        uint _price = items[_sku].price;
+        uint amountToRefund = msg.value - _price;
         items[_sku].buyer.transfer(amountToRefund);
     }
 
@@ -74,7 +74,7 @@ contract SupplyChain {
     // that an Item is for sale. Hint: What item properties will be non-zero when
     // an Item has been added?
 
-    modifier forSale(uint256 _sku) {
+    modifier forSale(uint _sku) {
         require(
             (items[_sku].seller != address(0)) &&
                 (items[_sku].state == State.ForSale),
@@ -82,15 +82,15 @@ contract SupplyChain {
         );
         _;
     }
-    modifier sold(uint256 _sku) {
+    modifier sold(uint _sku) {
         require((items[_sku].state == State.Sold), "Item not sold!");
         _;
     }
-    modifier shipped(uint256 _sku) {
+    modifier shipped(uint _sku) {
         require((items[_sku].state == State.Shipped), "Item not shipped!");
         _;
     }
-    modifier received(uint256 _sku) {
+    modifier received(uint _sku) {
         require((items[_sku].state == State.Received), "Item not received!");
         _;
     }
@@ -102,7 +102,7 @@ contract SupplyChain {
         skuCount = 0;
     }
 
-    function addItem(string memory _name, uint256 _price)
+    function addItem(string memory _name, uint _price)
         public
         returns (bool)
     {
@@ -157,20 +157,20 @@ contract SupplyChain {
     //    - the person calling this function is the buyer.
     // 2. Change the state of the item to received.
     // 3. Call the event associated with this function!
-    function receiveItem(uint256 sku) public shipped(sku) verifyCaller(items[sku].buyer) {
+    function receiveItem(uint sku) public shipped(sku) verifyCaller(items[sku].buyer) {
       items[sku].state = State.Received;
       emit LogReceived(sku);
     }
 
     // Uncomment the following code block. it is needed to run tests
-    function fetchItem(uint256 _sku)
+    function fetchItem(uint _sku)
         public
         view
         returns (
             string memory name,
-            uint256 sku,
-            uint256 price,
-            uint256 state,
+            uint sku,
+            uint price,
+            uint state,
             address seller,
             address buyer
         )
@@ -178,7 +178,7 @@ contract SupplyChain {
         name = items[_sku].name;
         sku = items[_sku].sku;
         price = items[_sku].price;
-        state = uint256(items[_sku].state);
+        state = uint(items[_sku].state);
         seller = items[_sku].seller;
         buyer = items[_sku].buyer;
         return (name, sku, price, state, seller, buyer);
